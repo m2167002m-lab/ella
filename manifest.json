@@ -1,0 +1,15 @@
+{
+  "name": "Okinawa Drive 2025",
+  "short_name": "Okinawa",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#F9F8F6",
+  "theme_color": "#9E2A2F",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/826/826070.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

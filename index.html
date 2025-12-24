@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Okinawa Drive 2025</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#9E2A2F">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js');
+        });
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --jp-red: #9E2A2F; --jp-beige: #F9F8F6; }
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: var(--jp-beige); color: #333; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; border-radius: 16px; border: 1px solid #EFECE8; box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow: hidden; }
+        .nav-active { color: var(--jp-red) !important; font-weight: 700; }
+        .tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 100px; font-weight: 700; }
+        .tag-res { background: #9E2A2F; color: white; }
+    </style>
+</head>
+<body class="pb-24">
+<div class="max-w-md mx-auto">
+    <header class="p-8 pt-12 flex justify-between items-end bg-white/50">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tighter">沖繩自駕遊</h1>
+            <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">2025.12.25 - 12.28</p>
+        </div>
+        <span class="text-[10px] font-bold text-red-700 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">🎄 Merry Christmas</span>
+    </header>
+
+    <div id="view-content" class="px-5 mt-6"></div>
+
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto h-20 bg-white/90 backdrop-blur-md border-t border-gray-100 flex justify-around items-center z-50">
+        <button onclick="renderView('itinerary')" class="nav-item flex flex-col items-center text-gray-400">
+            <span class="text-xl">📅</span><span class="text-[10px] mt-1">行程</span>
+        </button>
+        <button onclick="renderView('info')" class="nav-item flex flex-col items-center text-gray-400">
+            <span class="text-xl">✈️</span><span class="text-[10px] mt-1">資訊</span>
+        </button>
+        <button onclick="renderView('map')" class="nav-item flex flex-col items-center text-gray-400">
+            <span class="text-xl">🗺️</span><span class="text-[10px] mt-1">MAP</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+    const travelData = {
+        days: [
+            { date: "12/25 (Thu)", weather: "☀️ 21°C", title: "入境與美國村聖誕", items: [
+                { time: "19:20", name: "那霸機場 (OKA)", type: "交通", desc: "抵達沖繩，前往領取租車", maps: "Naha Airport", search: "那霸機場 入境攻略" },
+                { time: "21:45", name: "美國村 American Village", type: "景點", tag: "聖誕燈飾", desc: "欣賞濃郁聖誕氛圍的燈海", maps: "American Village Okinawa", search: "沖繩美國村 聖誕燈飾" }
+            ]},
+            { date: "12/26 (Fri)", weather: "☁️ 19°C", title: "北部自然美景", items: [
+                { time: "10:30", name: "萬座毛", type: "景點", desc: "欣賞象鼻形狀的斷崖絕壁", maps: "Manzamo", search: "萬座毛 景點故事" },
+                { time: "12:30", name: "百年古家 大家 (Ufuya)", type: "美食", tag: "必吃阿古豬", desc: "在百年老宅內享用道地料理", maps: "Ufuya Nago", search: "百年古家 大家 預約", res: "https://ufuya.com/" },
+                { time: "15:00", name: "美麗海水族館", type: "景點", desc: "黑潮之海的巨大鯨鯊奇觀", maps: "Churaumi Aquarium", search: "美麗海水族館 攻略", ticket: "https://tw.trip.com/travel-guide/attraction/motobu/okinawa-churaumi-aquarium-10559035?locale=zh-tw" },
+                { time: "19:00", name: "東南植物樂園", type: "景點", tag: "日本三大燈秀", desc: "絕美的冬季百萬燈光季", maps: "Southeast Botanical Gardens", search: "東南植物樂園 燈光秀", ticket: "https://tw.trip.com/travel-guide/attraction/okinawa/southeast-botanical-gardens-87063?locale=zh-tw" }
+            ]},
+            { date: "12/27 (Sat)", weather: "☀️ 22°C", title: "魚市與最後採買", items: [
+                { time: "09:30", name: "泊港魚市場", type: "美食", desc: "享用最鮮甜的海鮮刺身", maps: "Tomari Iyumachi", search: "泊港魚市場 必吃" },
+                { time: "12:00", name: "Crepe no Mori", type: "甜點", tag: "職人可麗餅", desc: "名護超人氣森林系可麗餅", maps: "Crepe no Mori", search: "Crepe no Mori 沖繩" },
+                { time: "14:00", name: "國際通", type: "景點", desc: "採買伴手禮與逛街散策", maps: "Kokusai Dori", search: "國際通 必買伴手禮" },
+                { time: "18:30", name: "琉球之牛 北谷店", type: "美食", tag: "必預約", desc: "頂級和牛聖誕大餐", maps: "Ryukyu no Ushi Chatan", search: "琉球之牛 北谷店 預約", res: "https://www.u-shi.net/chatan.html" }
+            ]},
+            { date: "12/28 (Sun)", weather: "☀️ 23°C", title: "瀨長島送機", items: [
+                { time: "08:30", name: "瀨長島幸福鬆餅", type: "景點", tag: "看飛機/鬆餅", desc: "純白希臘風景區與飛機起降", maps: "Umikaji Terrace Senagajima", search: "瀨長島 幸福鬆餅 預約" },
+                { time: "11:55", name: "那霸機場", type: "交通", desc: "準備返程回港 (UO 821)", maps: "Naha Airport", search: "那霸機場 伴手禮" }
+            ]}
+        ]
+    };
+
+    function renderView(view) {
+        const content = document.getElementById('view-content');
+        document.querySelectorAll('.nav-item').forEach((b, i) => b.classList.toggle('nav-active', ['itinerary','info','map'][i] === view));
+
+        if (view === 'itinerary') {
+            content.innerHTML = travelData.days.map(day => `
+                <div class="mb-10">
+                    <div class="flex justify-between items-center mb-4 border-l-4 border-[#9E2A2F] pl-3">
+                        <h2 class="text-xl font-bold font-serif">${day.date} ${day.weather}</h2>
+                        <span class="text-xs text-gray-400">${day.title}</span>
+                    </div>
+                    ${day.items.map(item => `
+                        <div class="card p-5 mb-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${item.type}</span>
+                                    <h3 class="text-lg font-bold mt-1">${item.name}</h3>
+                                </div>
+                                <span class="text-xs text-gray-400 mt-1">${item.time}</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 leading-relaxed">${item.desc}</p>
+                            ${item.tag ? `<span class="tag tag-res mt-2 inline-block">${item.tag}</span>` : ''}
+                            <div class="grid grid-cols-2 gap-2 mt-5">
+                                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.maps + ' Okinawa')}" target="_blank" class="bg-neutral-800 text-white text-center py-3 rounded-xl text-[11px] font-medium">Google Maps 導航</a>
+                                <a href="https://www.google.com/search?q=${encodeURIComponent(item.search)}" target="_blank" class="border-1.5 border-neutral-800 text-neutral-800 text-center py-3 rounded-xl text-[11px] font-bold" style="border: 1.5px solid #333;">查看介紹</a>
+                                ${item.ticket ? `<a href="${item.ticket}" target="_blank" class="col-span-2 bg-red-700 text-white text-center py-3 rounded-xl text-[11px] font-bold">購買門票</a>` : ''}
+                                ${item.res ? `<a href="${item.res}" target="_blank" class="col-span-2 bg-[#9E2A2F] text-white text-center py-3 rounded-xl text-[11px] font-bold">預約用餐</a>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        } else if (view === 'info') {
+            content.innerHTML = `
+                <div class="card p-6 mb-4">
+                    <h3 class="font-bold border-b pb-2 mb-4 text-[#9E2A2F]">航班資訊</h3>
+                    <p class="text-sm text-gray-600 leading-8">12/25 UO 826 | 15:50 → 19:20<br>12/28 UO 821 | 11:55 → 13:55<br><b>Booking Ref: UGYITV</b></p>
+                </div>
+                <div class="card p-6 mb-4"><h3 class="font-bold border-b pb-2 mb-4 text-blue-800">旅客資訊</h3><p class="text-sm text-gray-600 leading-8">LI/CHI ON MR<br>WAI/MEI KING MS</p></div>
+                <div class="card p-6 border-l-4 border-red-800"><h3 class="font-bold text-red-800 mb-2">緊急聯絡</h3><p class="text-sm">警察：110 | 急救：119</p></div>`;
+        } else if (view === 'map') {
+            content.innerHTML = `
+                <div class="mb-6 mt-2">
+                    <h2 class="text-sm font-bold text-gray-500 mb-4 tracking-widest uppercase">全覽地圖與重要資訊</h2>
+                    <div class="card">
+                        <div class="p-4 bg-white flex items-center gap-2">
+                            <span class="text-green-600">🗺️</span><span class="font-bold text-sm">全沖繩地圖</span>
+                        </div>
+                        <div style="width: 100%; height: 350px;">
+                            <iframe width="100%" height="100%" frameborder="0" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d458425.28913958045!2d127.929845!3d26.489112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1szh-TW!2stw!4v1700000000000!5m2!1szh-TW!2stw" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=Naha+Airport+Okinawa" target="_blank" class="flex items-center justify-center gap-2 w-full bg-white color-[#3182CE] font-bold py-4 border-t text-sm text-blue-600">
+                            開啟 Google Maps 全程導航
+                        </a>
+                    </div>
+                </div>
+                <div class="card p-6 bg-zinc-900 text-white flex justify-between items-center mb-4">
+                    <div><span class="text-[10px] bg-red-600 px-2 py-1 rounded font-bold mb-2 inline-block">MUST HAVE</span><h3 class="text-xl font-bold">Visit Japan Web</h3><p class="text-[10px] text-zinc-400 mt-1">入境審查 & 海關申報</p></div>
+                    <a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank" class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700">↗️</a>
+                </div>`;
+        }
+        window.scrollTo(0,0);
+    }
+    renderView('itinerary');
+</script>
+</body>
+</html>
